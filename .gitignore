@@ -5,3 +5,11 @@ bin
 # binaries dump
 dump
 
+# test
+test
+
+# setting
+.*
+
+# notes
+notes
