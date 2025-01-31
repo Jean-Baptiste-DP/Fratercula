@@ -26,9 +26,10 @@ typedef struct{
     uint64_t storageSize;
     uint64_t contentSize;
     char * data;
-} *Section;
+}Section;
 
-Error sectionInit(Section, SectionHeaderType);
-Error sectionAppendData(Section, char *, uint64_t);
+Section * sectionNew(SectionHeaderType);
+void sectionFree(Section *);
+Error sectionAppendData(Section *, char *, uint64_t);
 
 #endif //SECTIONHEADER_H

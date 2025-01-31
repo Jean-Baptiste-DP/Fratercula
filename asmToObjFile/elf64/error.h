@@ -4,6 +4,9 @@
 #include "stdint.h"
 
 // TODO
-typedef uint8_t Error;
+typedef enum{
+    NO_ERROR,
+    FAILED_TO_ALLOCATE,
+} Error;
 
 #endif //ERROR_H
