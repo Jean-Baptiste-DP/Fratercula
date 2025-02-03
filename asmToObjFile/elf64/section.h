@@ -18,17 +18,17 @@ typedef enum
     SECTION_DYNAMIC,
     SECTION_DYNSTR,
     SECTION_DYNSYM,
-} SectionHeaderType;
+} SectionType;
 
 typedef struct{
-    SectionHeaderType sectionType;
+    SectionType sectionType;
     Elf64_Shdr header;
     uint64_t storageSize;
     uint64_t contentSize;
     char * data;
 }Section;
 
-Section * sectionNew(SectionHeaderType);
+Section * sectionNew(SectionType);
 void sectionFree(Section *);
 Error sectionAppendData(Section *, char *, uint64_t);
 

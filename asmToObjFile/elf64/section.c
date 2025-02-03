@@ -17,7 +17,7 @@ Elf64_Shdr shdrSymtab = {.sh_type = SHT_SYMTAB,.sh_flags = 0,.sh_addr = 0,.sh_ad
 Elf64_Shdr shdrRela = {.sh_type = SHT_RELA,.sh_flags = 0,.sh_addr = 0,.sh_addralign = 8,.sh_entsize = sizeof(Elf64_Rela)};
 
 // Create a new Section
-Section * sectionNew(SectionHeaderType sectionType){
+Section * sectionNew(SectionType sectionType){
     Section * section = malloc(sizeof(Section));
 
     section->sectionType = sectionType;
