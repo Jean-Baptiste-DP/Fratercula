@@ -3,6 +3,9 @@
 
 #include "section.h"
 
+// Local function definition
+static uint64_t _next_power_of_2(uint64_t);
+
 // Already filled
 Elf64_Shdr shdrNull = {.sh_name = 0,.sh_type = SHT_NULL,.sh_flags = 0,.sh_addr = 0,.sh_offset = 0,.sh_size = 0,.sh_link = 0,.sh_info = 0,.sh_addralign = 0,.sh_entsize = 0};
 
@@ -53,15 +56,21 @@ Section * sectionNew(SectionType sectionType){
     section->contentSize = 0;
     section->storageSize = 0;
     section->data = NULL;
+
+    // TODO create other Section if needed
+    // ie symtab need strtab
+
     return sectionType;
 }
 
 // Free Section memory
 void sectionFree(Section * section){
-    if(section->data!=NULL){
-        free(section->data);
+    if(section!=NULL){
+        if(section->data!=NULL){
+            free(section->data);
+        }
+        free(section);
     }
-    free(section);
 }
 
 // Get the lowest power of 2 that is greater than n
