@@ -28,7 +28,7 @@ typedef struct{
     char * data;
 }Section;
 
-Section * sectionNew(SectionType);
+Section * sectionNew(SectionType, SectionHeader *);
 void sectionFree(Section *);
 Error sectionAppendData(Section *, char *, uint64_t);
 

@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "section.h"
+#include "secManager.h"
 
 // Local function definition
 static uint64_t _next_power_of_2(uint64_t);
@@ -20,7 +21,7 @@ Elf64_Shdr shdrSymtab = {.sh_type = SHT_SYMTAB,.sh_flags = 0,.sh_addr = 0,.sh_ad
 Elf64_Shdr shdrRela = {.sh_type = SHT_RELA,.sh_flags = 0,.sh_addr = 0,.sh_addralign = 8,.sh_entsize = sizeof(Elf64_Rela)};
 
 // Create a new Section
-Section * sectionNew(SectionType sectionType){
+Section * sectionNew(SectionType sectionType, SectionHeader * secHead){
     Section * section = malloc(sizeof(Section));
 
     section->sectionType = sectionType;
@@ -32,21 +33,35 @@ Section * sectionNew(SectionType sectionType){
         break;
     case SECTION_TEXT:
         section->header = shdrText;
+        // TODO extract position of the name to fill sh_name
+        sectionHeaderAddDataToSection(secHead, SECTION_SHSTRTAB, ".text", strlen(".text")+1);
         break;
     case SECTION_SHSTRTAB:
         section->header = shdrShstrtab;
+        // TODO Add ".shstrtab\0" in it data without calling sectionHeaderAddDataToSection -> 
         break;
     case SECTION_RODATA:
         section->header = shdrRodata;
+        // TODO extract position of the name to fill sh_name
+        sectionHeaderAddDataToSection(secHead, SECTION_SHSTRTAB, ".rodata", strlen(".rodata")+1);
         break;
     case SECTION_STRTAB:
         section->header = shdrStrtab;
+        // TODO extract position of the name to fill sh_name
+        sectionHeaderAddDataToSection(secHead, SECTION_SHSTRTAB, ".strtab", strlen(".strtab")+1);
         break;
     case SECTION_SYMTAB:
         section->header = shdrSymtab;
+        // TODO add sh_link / sh_info
+        // TODO extract position of the name to fill sh_name
+        sectionHeaderAddDataToSection(secHead, SECTION_SHSTRTAB, ".symtab", strlen(".symtab")+1);
         break;
     case SECTION_RELA:
         section->header = shdrRela;
+        // TODO name depend on sh_link (.rela.text if linked on .text) 
+        // TODO add sh_link / sh_info
+        // TODO extract position of the name to fill sh_name
+        sectionHeaderAddDataToSection(secHead, SECTION_SHSTRTAB, ".rela.text", strlen(".rela.text")+1);
         break;
     default:
         section->header = shdrNull;
@@ -57,7 +72,6 @@ Section * sectionNew(SectionType sectionType){
     section->storageSize = 0;
     section->data = NULL;
 
-    // TODO create other Section if needed
     // ie symtab need strtab
 
     return sectionType;
