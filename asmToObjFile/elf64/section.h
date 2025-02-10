@@ -4,21 +4,23 @@
 #include "elf.h"
 #include "error.h"
 
-typedef enum
-{
-    SECTION_NULL,
-    SECTION_TEXT,
-    SECTION_SHSTRTAB,
-    SECTION_RODATA,
-    SECTION_SYMTAB,
-    SECTION_STRTAB,
-    SECTION_RELA,
-    SECTION_DATA,
-    SECTION_BSS,
-    SECTION_DYNAMIC,
-    SECTION_DYNSTR,
-    SECTION_DYNSYM,
-} SectionType;
+/* Legal values for sectionType.  */
+typedef uint8_t SectionType;
+
+#define SECTION_NULL        (0)
+#define SECTION_TEXT        (1)	
+#define SECTION_SHSTRTAB    (2)	
+#define SECTION_RODATA      (3)	
+#define SECTION_SYMTAB      (4)	
+#define SECTION_STRTAB      (5)	
+#define SECTION_DATA        (6)	
+#define SECTION_BSS         (7)
+#define SECTION_DYNAMIC     (8)	
+#define SECTION_DYNSTR      (9)	
+#define SECTION_DYNSYM      (10)
+// It's possible to combine SECTION_RELA with other one (like SECTION_TEXT => SECTION_TEXT + SECTION_RELA : .rela.text)
+#define SECTION_RELA        (1U << 6)
+#define SECTION_REL         (2U << 6)
 
 typedef struct{
     SectionType sectionType;

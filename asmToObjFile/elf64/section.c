@@ -11,7 +11,7 @@ static uint64_t _next_power_of_2(uint64_t);
 Elf64_Shdr shdrNull = {.sh_name = 0,.sh_type = SHT_NULL,.sh_flags = 0,.sh_addr = 0,.sh_offset = 0,.sh_size = 0,.sh_link = 0,.sh_info = 0,.sh_addralign = 0,.sh_entsize = 0};
 
 // Need sh_name / sh_offset / sh_size
-Elf64_Shdr shdrText = {.sh_type = SHT_PROGBITS,.sh_flags = SHF_ALLOC | SHF_EXECINSTR,.sh_addr = 0,.sh_link = 0,.sh_info = 0,.sh_addralign = 16,.sh_entsize = 0};
+Elf64_Shdr shdrText = {.sh_type = SHT_PROGBITS,.sh_flags = SHF_ALLOC + SHF_EXECINSTR,.sh_addr = 0,.sh_link = 0,.sh_info = 0,.sh_addralign = 16,.sh_entsize = 0};
 Elf64_Shdr shdrShstrtab = {.sh_type = SHT_STRTAB,.sh_flags = 0,.sh_addr = 0,.sh_link = 0,.sh_info = 0,.sh_addralign = 1,.sh_entsize = 0};
 Elf64_Shdr shdrRodata = {.sh_type = SHT_PROGBITS,.sh_flags = SHF_ALLOC,.sh_addr = 0,.sh_link = 0,.sh_info = 0,.sh_addralign = 4,.sh_entsize = 0};
 Elf64_Shdr shdrStrtab = {.sh_type = SHT_STRTAB,.sh_flags = 0,.sh_addr = 0,.sh_link = 0,.sh_info = 0,.sh_addralign = 1,.sh_entsize = 0};
@@ -26,6 +26,7 @@ Section * sectionNew(SectionType sectionType, SectionHeader * secHead){
 
     section->sectionType = sectionType;
 
+    // If not SECTION_RELA
     switch (sectionType)
     {
     case SECTION_NULL:
@@ -56,13 +57,14 @@ Section * sectionNew(SectionType sectionType, SectionHeader * secHead){
         // TODO extract position of the name to fill sh_name
         sectionHeaderAddDataToSection(secHead, SECTION_SHSTRTAB, ".symtab", strlen(".symtab")+1);
         break;
-    case SECTION_RELA:
-        section->header = shdrRela;
-        // TODO name depend on sh_link (.rela.text if linked on .text) 
-        // TODO add sh_link / sh_info
-        // TODO extract position of the name to fill sh_name
-        sectionHeaderAddDataToSection(secHead, SECTION_SHSTRTAB, ".rela.text", strlen(".rela.text")+1);
-        break;
+    // TODO SECTION_RELA case
+    // case SECTION_RELA:
+    //     section->header = shdrRela;
+    //     // TODO name depend on sh_link (.rela.text if linked on .text) 
+    //     // TODO add sh_link / sh_info
+    //     // TODO extract position of the name to fill sh_name
+    //     sectionHeaderAddDataToSection(secHead, SECTION_SHSTRTAB, ".rela.text", strlen(".rela.text")+1);
+    //     break;
     default:
         section->header = shdrNull;
         break;
