@@ -32,6 +32,6 @@ typedef struct{
 
 Section * sectionNew(SectionType, SectionHeader *);
 void sectionFree(Section *);
-Error sectionAppendData(Section *, char *, uint64_t);
+Error sectionAppendData(Section *, char *, uint64_t, uint64_t *);
 
 #endif //SECTIONHEADER_H

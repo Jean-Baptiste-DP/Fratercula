@@ -58,7 +58,7 @@ static Section * _sectionHeaderNewSection(SectionHeader * secHead, SectionType s
     return sec;
 }
 
-Error sectionHeaderAddDataToSection(SectionHeader *secHead, SectionType sectionType, char * data, uint64_t dataSize){
-
+Error sectionHeaderAddDataToSection(SectionHeader *secHead, SectionType sectionType, char * data, uint64_t dataSize, uint64_t * headOfData){
+    
 };
 

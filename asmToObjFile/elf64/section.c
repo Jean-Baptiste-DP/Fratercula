@@ -22,9 +22,16 @@ Elf64_Shdr shdrRela = {.sh_type = SHT_RELA,.sh_flags = 0,.sh_addr = 0,.sh_addral
 
 // Create a new Section
 Section * sectionNew(SectionType sectionType, SectionHeader * secHead){
+    // TODO error managing
+    uint64_t headOfAddedData = 0;
+    
     Section * section = malloc(sizeof(Section));
-
+    
     section->sectionType = sectionType;
+    section->contentSize = 0;
+    section->storageSize = 0;
+    section->data = NULL;
+
 
     // If not SECTION_RELA
     switch (sectionType)
@@ -34,28 +41,24 @@ Section * sectionNew(SectionType sectionType, SectionHeader * secHead){
         break;
     case SECTION_TEXT:
         section->header = shdrText;
-        // TODO extract position of the name to fill sh_name
-        sectionHeaderAddDataToSection(secHead, SECTION_SHSTRTAB, ".text", strlen(".text")+1);
+        sectionHeaderAddDataToSection(secHead, SECTION_SHSTRTAB, ".text", strlen(".text")+1, &headOfAddedData);
         break;
     case SECTION_SHSTRTAB:
         section->header = shdrShstrtab;
-        // TODO Add ".shstrtab\0" in it data without calling sectionHeaderAddDataToSection -> 
+        sectionAppendData(section, ".shstrtab", strlen(".shstrtab")+1, &headOfAddedData);
         break;
     case SECTION_RODATA:
         section->header = shdrRodata;
-        // TODO extract position of the name to fill sh_name
-        sectionHeaderAddDataToSection(secHead, SECTION_SHSTRTAB, ".rodata", strlen(".rodata")+1);
+        sectionHeaderAddDataToSection(secHead, SECTION_SHSTRTAB, ".rodata", strlen(".rodata")+1, &headOfAddedData);
         break;
     case SECTION_STRTAB:
         section->header = shdrStrtab;
-        // TODO extract position of the name to fill sh_name
-        sectionHeaderAddDataToSection(secHead, SECTION_SHSTRTAB, ".strtab", strlen(".strtab")+1);
+        sectionHeaderAddDataToSection(secHead, SECTION_SHSTRTAB, ".strtab", strlen(".strtab")+1, &headOfAddedData);
         break;
     case SECTION_SYMTAB:
         section->header = shdrSymtab;
         // TODO add sh_link / sh_info
-        // TODO extract position of the name to fill sh_name
-        sectionHeaderAddDataToSection(secHead, SECTION_SHSTRTAB, ".symtab", strlen(".symtab")+1);
+        sectionHeaderAddDataToSection(secHead, SECTION_SHSTRTAB, ".symtab", strlen(".symtab")+1, &headOfAddedData);
         break;
     // TODO SECTION_RELA case
     // case SECTION_RELA:
@@ -69,12 +72,8 @@ Section * sectionNew(SectionType sectionType, SectionHeader * secHead){
         section->header = shdrNull;
         break;
     }
-    
-    section->contentSize = 0;
-    section->storageSize = 0;
-    section->data = NULL;
 
-    // ie symtab need strtab
+    section->header.sh_name = headOfAddedData;
 
     return sectionType;
 }
@@ -104,11 +103,13 @@ static uint64_t _next_power_of_2(uint64_t n) {
 }
 
 
-Error sectionAppendData(Section * section, char * data, uint64_t dataSize){
+Error sectionAppendData(Section * section, char * data, uint64_t dataSize, uint64_t * headOfData){
     Error err = NO_ERROR;
+
     if(section->contentSize + dataSize <= section->storageSize){
         // It's possible to copy data in section storage
         memcpy(section->data + section->contentSize, data, dataSize);
+        *headOfData = section->contentSize;
         section->contentSize += dataSize;
     }else{
         // Data isn't enough to store both previous and new data
@@ -127,6 +128,7 @@ Error sectionAppendData(Section * section, char * data, uint64_t dataSize){
 
         memcpy(newStorage, data, dataSize);
         section->storageSize = newStorageSize;
+        *headOfData = section->contentSize;
         section->contentSize += dataSize;
         section->data = newStorage;
     }
