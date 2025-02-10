@@ -16,7 +16,7 @@ SectionHeader * sectionHeaderInit(){
 void sectionHeaderFree(SectionHeader * secHeader){
     if(secHeader!=NULL){
         if(secHeader->allSections!=NULL){
-            for(uint16_t i=0; i<secHeader->size && i<UINT16_MAX; i++){
+            for(uint16_t i=0; i<secHeader->size && i<UINT32_MAX; i++){
                 sectionFree(secHeader->allSections[i]);
             }
             free(secHeader->allSections);
@@ -26,7 +26,7 @@ void sectionHeaderFree(SectionHeader * secHeader){
 };
 
 Section * sectionHeaderGetByType(SectionHeader * secHead, SectionType sectionType){
-    for(uint16_t i = 0; i<secHead->size && i<UINT16_MAX; i++){
+    for(uint16_t i = 0; i<secHead->size && i<UINT32_MAX; i++){
         if(secHead->allSections[i]->sectionType == sectionType){
             return secHead->allSections[i];
         }
@@ -34,8 +34,8 @@ Section * sectionHeaderGetByType(SectionHeader * secHead, SectionType sectionTyp
     return _sectionHeaderNewSection(secHead,sectionType);
 }
 
-uint16_t sectionHeaderGetIndex(SectionHeader * secHead, SectionType sectionType){
-    for(uint16_t i = 0; i<secHead->size && i<UINT16_MAX; i++){
+uint32_t sectionHeaderGetIndex(SectionHeader * secHead, SectionType sectionType){
+    for(uint16_t i = 0; i<secHead->size && i<UINT32_MAX; i++){
         if(secHead->allSections[i]->sectionType == sectionType){
             return i;
         }
@@ -46,10 +46,6 @@ uint16_t sectionHeaderGetIndex(SectionHeader * secHead, SectionType sectionType)
 
 static Section * _sectionHeaderNewSection(SectionHeader * secHead, SectionType sectionType){
     Section * sec;
-
-    if((sec = sectionHeaderGetByType(secHead, sectionType))!=NULL){
-        return sec;
-    }
 
     Section ** newSectionArray = malloc((secHead->size + 1) * sizeof(Section *));
 

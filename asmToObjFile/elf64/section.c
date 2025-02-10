@@ -57,8 +57,9 @@ Section * sectionNew(SectionType sectionType, SectionHeader * secHead){
         break;
     case SECTION_SYMTAB:
         section->header = shdrSymtab;
-        // TODO add sh_link / sh_info
         sectionHeaderAddDataToSection(secHead, SECTION_SHSTRTAB, ".symtab", strlen(".symtab")+1, &headOfAddedData);
+        section->header.sh_link = sectionHeaderGetIndex(secHead, SECTION_STRTAB);
+        section->header.sh_info = 0;
         break;
     // TODO SECTION_RELA case
     // case SECTION_RELA:
@@ -104,6 +105,7 @@ static uint64_t _next_power_of_2(uint64_t n) {
 
 
 Error sectionAppendData(Section * section, char * data, uint64_t dataSize, uint64_t * headOfData){
+    // TODO need to update sh_info of SECTION_SYMTAB
     Error err = NO_ERROR;
 
     if(section->contentSize + dataSize <= section->storageSize){
