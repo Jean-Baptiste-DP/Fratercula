@@ -26,7 +26,6 @@ void sectionHeaderFree(SectionHeader * secHeader){
 };
 
 Section * sectionHeaderGetByType(SectionHeader * secHead, SectionType sectionType){
-    // TODO how to deal with multiple SECTION_RELA sections
     for(uint16_t i = 0; i<secHead->size && i<UINT16_MAX; i++){
         if(secHead->allSections[i]->sectionType == sectionType){
             return secHead->allSections[i];
@@ -35,10 +34,20 @@ Section * sectionHeaderGetByType(SectionHeader * secHead, SectionType sectionTyp
     return _sectionHeaderNewSection(secHead,sectionType);
 }
 
+uint16_t sectionHeaderGetIndex(SectionHeader * secHead, SectionType sectionType){
+    for(uint16_t i = 0; i<secHead->size && i<UINT16_MAX; i++){
+        if(secHead->allSections[i]->sectionType == sectionType){
+            return i;
+        }
+    }
+    _sectionHeaderNewSection(secHead,sectionType);
+    return secHead->size-1;
+}
+
 static Section * _sectionHeaderNewSection(SectionHeader * secHead, SectionType sectionType){
     Section * sec;
 
-    if((sec = _sectionHeaderGetByType(secHead, sectionType))!=NULL){
+    if((sec = sectionHeaderGetByType(secHead, sectionType))!=NULL){
         return sec;
     }
 
@@ -59,6 +68,6 @@ static Section * _sectionHeaderNewSection(SectionHeader * secHead, SectionType s
 }
 
 Error sectionHeaderAddDataToSection(SectionHeader *secHead, SectionType sectionType, char * data, uint64_t dataSize, uint64_t * headOfData){
-    
+
 };
 
