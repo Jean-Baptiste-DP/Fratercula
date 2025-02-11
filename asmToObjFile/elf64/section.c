@@ -33,44 +33,76 @@ Section * sectionNew(SectionType sectionType, SectionHeader * secHead){
     section->data = NULL;
 
 
-    // If not SECTION_RELA
-    switch (sectionType)
-    {
+    // Init section
+    switch (sectionType){
     case SECTION_NULL:
         section->header = shdrNull;
         break;
     case SECTION_TEXT:
         section->header = shdrText;
-        sectionHeaderAddDataToSection(secHead, SECTION_SHSTRTAB, ".text", strlen(".text")+1, &headOfAddedData);
         break;
     case SECTION_SHSTRTAB:
         section->header = shdrShstrtab;
-        sectionAppendData(section, ".shstrtab", strlen(".shstrtab")+1, &headOfAddedData);
         break;
     case SECTION_RODATA:
         section->header = shdrRodata;
-        sectionHeaderAddDataToSection(secHead, SECTION_SHSTRTAB, ".rodata", strlen(".rodata")+1, &headOfAddedData);
         break;
     case SECTION_STRTAB:
         section->header = shdrStrtab;
-        sectionHeaderAddDataToSection(secHead, SECTION_SHSTRTAB, ".strtab", strlen(".strtab")+1, &headOfAddedData);
         break;
     case SECTION_SYMTAB:
+        // TODO add NULL symbol
         section->header = shdrSymtab;
-        sectionHeaderAddDataToSection(secHead, SECTION_SHSTRTAB, ".symtab", strlen(".symtab")+1, &headOfAddedData);
         section->header.sh_link = sectionHeaderGetIndex(secHead, SECTION_STRTAB);
         section->header.sh_info = 0;
         break;
-    // TODO SECTION_RELA case
-    // case SECTION_RELA:
-    //     section->header = shdrRela;
-    //     // TODO name depend on sh_link (.rela.text if linked on .text) 
-    //     // TODO add sh_link / sh_info
-    //     // TODO extract position of the name to fill sh_name
-    //     sectionHeaderAddDataToSection(secHead, SECTION_SHSTRTAB, ".rela.text", strlen(".rela.text")+1);
-    //     break;
     default:
-        section->header = shdrNull;
+        if(sectionType & (3U << 6) == SECTION_RELA){
+            section->header = shdrRela;
+            section->header.sh_link = sectionHeaderGetIndex(secHead, SECTION_SYMTAB);
+            section->header.sh_info = sectionHeaderGetIndex(secHead, sectionType ^ SECTION_RELA);
+        }else{
+            section->header = shdrNull;
+        }
+        break;
+    }
+    
+    
+    // sh_name
+    // store name in SECTION_SHSTRTAB (SECTION_RELA + SECTION_TEXT => .rela.text\0)
+
+    switch (sectionType & (3U << 6))
+    {
+    case SECTION_RELA:
+        sectionHeaderAddDataToSection(secHead, SECTION_SHSTRTAB, ".rela", strlen(".rela"), &headOfAddedData);
+        break;
+    default:
+        break;
+    }
+
+    switch ((sectionType << 2) >> 2)
+    {
+    case SECTION_TEXT:
+        sectionHeaderAddDataToSection(secHead, SECTION_SHSTRTAB, ".text", strlen(".text")+1, &headOfAddedData); // +1 -> add \0 char
+        break;
+    case SECTION_SHSTRTAB:
+        if(sectionType == SECTION_SHSTRTAB){
+            sectionAppendData(section, ".shstrtab", strlen(".shstrtab")+1, &headOfAddedData);
+        }else{// if .rela.shstrtab
+            sectionHeaderAddDataToSection(secHead, SECTION_SHSTRTAB, ".shstrtab", strlen(".shstrtab")+1, &headOfAddedData);
+        }
+        break;
+    case SECTION_RODATA:
+        sectionHeaderAddDataToSection(secHead, SECTION_SHSTRTAB, ".rodata", strlen(".rodata")+1, &headOfAddedData);
+        break;
+    case SECTION_STRTAB:
+        sectionHeaderAddDataToSection(secHead, SECTION_SHSTRTAB, ".strtab", strlen(".strtab")+1, &headOfAddedData);
+        break;
+    case SECTION_SYMTAB:
+        sectionHeaderAddDataToSection(secHead, SECTION_SHSTRTAB, ".symtab", strlen(".symtab")+1, &headOfAddedData);
+        break;
+    default:
+        sectionHeaderAddDataToSection(section, SECTION_SHSTRTAB, "\0", 1, &headOfAddedData);
         break;
     }
 
@@ -93,7 +125,7 @@ void sectionFree(Section * section){
 static uint64_t _next_power_of_2(uint64_t n) {
     if (n == 0) return 1;
 
-    n--; // Évite le cas où `n` est déjà une puissance de 2
+    n--; // Avoid when `n` is already a power of 2
     n |= n >> 1;
     n |= n >> 2;
     n |= n >> 4;

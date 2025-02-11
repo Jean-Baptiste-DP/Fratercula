@@ -114,7 +114,7 @@ int main(){
             .sh_addr = 0,
             .sh_offset = entryOffset + textSize + shstrtabSize + rodataSize,
             .sh_size = symtabSize,
-            .sh_link = 5,
+            .sh_link = 5,// Index of strtab
             .sh_info = 4,// Index of the last local symbol
             .sh_addralign = 8,
             .sh_entsize = sizeof(Elf64_Sym)
@@ -192,7 +192,6 @@ int main(){
 
     FILE* file = fopen("executable.o", "w");
 
-    // TODO revoir l'ordre
     fwrite(&header, headerSize, 1, file);
     fwrite(&sectionHeader, sectionHeaderSize, 1, file);
 

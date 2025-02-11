@@ -14,3 +14,5 @@ Section * sectionHeaderGetByType(SectionHeader *, SectionType);
 uint32_t sectionHeaderGetIndex(SectionHeader *, SectionType);
 Error sectionHeaderAddDataToSection(SectionHeader *, SectionType, char *, uint64_t, uint64_t *);
 
+Error sectionHeaderAddSymbol(SectionHeader *, SectionType, char *, uint64_t, uint64_t);
+Error sectionHeaderAddExternalSymbol(SectionHeader *, SectionType, char *, uint64_t, uint64_t);

@@ -64,6 +64,16 @@ static Section * _sectionHeaderNewSection(SectionHeader * secHead, SectionType s
 }
 
 Error sectionHeaderAddDataToSection(SectionHeader *secHead, SectionType sectionType, char * data, uint64_t dataSize, uint64_t * headOfData){
-
+    Section * section = sectionHeaderGetByType(secHead, sectionType);
+    return sectionAppendData(section, data, dataSize, headOfData);
 };
 
+Error sectionHeaderAddSymbol(SectionHeader *secHead, SectionType setionType, char *varName, uint64_t varNameSize, uint64_t sectionOffset){
+    // bind STB_LOCAL
+    // TODO
+}
+
+Error sectionHeaderAddExternalSymbol(SectionHeader *secHead, SectionType setionType, char *varName, uint64_t varNameSize, uint64_t sectionOffset){
+    // bind STB_GLOBAL
+    // TODO
+}
